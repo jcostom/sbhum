@@ -1,0 +1,37 @@
+---
+version: '3'
+
+services:
+  sbhum:
+    image: jcostom/sbhum:latest
+    container_name: sbhum
+    restart: unless-stopped
+    environment:
+      plugIP: FIXME-IP-ADDR
+      low: 40
+      high: 55
+      minRunTime: 900
+      sleepTime: 180
+      APIKEY: FIXME-APIKEY
+      DEVID: FIXME-DEVID
+      TZ: America/New_York
+      influxBucket: FIXME
+      influxOrg: FIXME
+      influxToken: 'FIXME'
+      influxURL: 'http://FIXME:8086/'
+      influxMeasurement: FIXME
+    networks:
+      - containers
+
+networks:
+  containers:
+    external: true
+
+# or, if you don't already have that network defined, you could do it in this compose file.
+# networks:
+#   containers:
+#     name: containers
+#     driver: bridge
+#     attachable: true
+#     driver_opts:
+#       com.docker.network.bridge.name: br-containers

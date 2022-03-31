@@ -91,9 +91,10 @@ def main():
         ]
         write_api.write(bucket=influxBucket, record=record)
         if rH >= high:
-            # kick on dehumidifier for min run time
             asyncio.run(plugOn(plugIP))
             writeLogEntry('Change state to ON, rH', rH)
+            # sleep for specified min run time, less standard sleep time,
+            # we will still perform that sleep later anyhow.
             time.sleep(realMinRunTime)
         elif rH < low:
             asyncio.run(plugOff(plugIP))
