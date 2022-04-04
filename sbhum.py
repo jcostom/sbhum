@@ -21,7 +21,7 @@ influxToken = os.getenv('influxToken')
 influxURL = os.getenv('influxURL')
 influxMeasurement = os.getenv('influxMeasurement')
 
-version = '0.1'
+version = '0.2'
 UA_STRING = "/".join(
     ("sbhum.py", version)
 )
