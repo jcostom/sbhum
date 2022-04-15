@@ -23,7 +23,7 @@ influxURL = os.getenv('influxURL')
 influxMeasurement = os.getenv('influxMeasurement')
 DEBUG = int(os.getenv('DEBUG', 0))
 
-version = '0.3'
+version = '0.4'
 UA_STRING = "/".join(
     ["sbhum.py", version]
 )
