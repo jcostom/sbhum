@@ -87,7 +87,7 @@ def main():
     influxClient = InfluxDBClient(url=influxURL, token=influxToken,
                                   org=influxOrg)
     write_api = influxClient.write_api(write_options=SYNCHRONOUS)
-    logger.info("Startup: {}".format(UA_STRING))
+    logger.info(f"Startup: {UA_STRING}")
     while True:
         (degF, rH) = readSensor(url, headers)
         watts = asyncio.run(readConsumption(plugIP))
@@ -104,13 +104,13 @@ def main():
         write_api.write(bucket=influxBucket, record=record)
         if rH >= high:
             asyncio.run(plugOn(plugIP))
-            logger.info("Change state to ON, rH: {}".format(rH))
+            logger.info(f"Change state to ON, rH: {rH}")
             # sleep for specified min run time, less standard sleep time,
             # we will still perform that sleep later anyhow.
             sleep(realMinRunTime)
         elif rH < low:
             asyncio.run(plugOff(plugIP))
-            logger.info("Change state to OFF, rH: {}".format(rH))
+            logger.info(f"Change state to OFF, rH: {rH}")
         else:
             pass
         sleep(sleepTime)
