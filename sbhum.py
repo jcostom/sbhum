@@ -9,24 +9,22 @@ from kasa import SmartPlug
 from influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import SYNCHRONOUS
 
-plugIP = os.getenv('plugIP')
-low = int(os.getenv('low', 40))
-high = int(os.getenv('high', 55))
-minRunTime = int(os.getenv('minRunTime', 900))
-sleepTime = int(os.getenv('sleepTime', 180))
+PLUG_IP = os.getenv('PLUG_IP')
+LOW = int(os.getenv('LOW', 40))
+HIGH = int(os.getenv('HIGH', 55))
+MIN_RUN_TIME = int(os.getenv('MIN_RUN_TIME', 900))
+SLEEP_TIME = int(os.getenv('SLEEP_TIME', 180))
 APIKEY = os.getenv('APIKEY')
 DEVID = os.getenv('DEVID')
-influxBucket = os.getenv('influxBucket')
-influxOrg = os.getenv('influxOrg')
-influxToken = os.getenv('influxToken')
-influxURL = os.getenv('influxURL')
-influxMeasurement = os.getenv('influxMeasurement')
+INFLUX_BUCKET = os.getenv('INFLUX_BUCKET')
+INFLUX_ORG = os.getenv('INFLUX_ORG')
+INFLUX_TOKEN = os.getenv('INFLUX_TOKEN')
+INFLUX_URL = os.getenv('INFLUX_URL')
+INFLUX_MEASUREMENT = os.getenv('INFLUX_MEASUREMENT')
 DEBUG = int(os.getenv('DEBUG', 0))
 
-version = '0.4'
-UA_STRING = "/".join(
-    ["sbhum.py", version]
-)
+VER = '0.5'
+UA_STRING = f"sbhum.py/{VER}"
 
 # Setup logger
 logger = logging.getLogger()
@@ -44,30 +42,30 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
-def c2f(celsius):
+def c2f(celsius: float) -> float:
     return (celsius * 9/5) + 32
 
 
-def readSensor(sbURL, sbHeaders):
-    r = requests.get(sbURL, headers=sbHeaders)
+def read_sensor(sb_url: str, sb_headers: dict) -> list:
+    r = requests.get(sb_url, headers=sb_headers)
     # return array of (degF, rHum)
-    return (round(c2f(r.json()['body']['temperature']), 1),
-            r.json()['body']['humidity'])
+    return [round(c2f(r.json()['body']['temperature']), 1),
+            r.json()['body']['humidity']]
 
 
-async def plugOff(ip):
+async def plug_off(ip: str) -> None:
     p = SmartPlug(ip)
     await p.update()
     await p.turn_off()
 
 
-async def plugOn(ip):
+async def plug_on(ip: str) -> None:
     p = SmartPlug(ip)
     await p.update()
     await p.turn_on()
 
 
-async def readConsumption(ip):
+async def read_consumption(ip: str) -> float:
     p = SmartPlug(ip)
     await p.update()
     watts = await p.current_consumption()
@@ -77,43 +75,39 @@ async def readConsumption(ip):
 def main():
     # True Min Run time should be the specified interval less the
     # regular sleep time
-    realMinRunTime = minRunTime - sleepTime
-    url = "/".join(
-        ("https://api.switch-bot.com/v1.0/devices",
-         DEVID,
-         "status")
-    )
+    real_min_run_time = MIN_RUN_TIME - SLEEP_TIME
+    url = f"https://api.switch-bot.com/v1.0/devices/{DEVID}/status"
     headers = {'Authorization': APIKEY}
-    influxClient = InfluxDBClient(url=influxURL, token=influxToken,
-                                  org=influxOrg)
-    write_api = influxClient.write_api(write_options=SYNCHRONOUS)
+    influx_client = InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN,
+                                   org=INFLUX_ORG)
+    write_api = influx_client.write_api(write_options=SYNCHRONOUS)
     logger.info(f"Startup: {UA_STRING}")
     while True:
-        (degF, rH) = readSensor(url, headers)
-        watts = asyncio.run(readConsumption(plugIP))
+        (deg_f, rel_hum) = read_sensor(url, headers)
+        watts = asyncio.run(read_consumption(PLUG_IP))
         record = [
             {
-                "measurement": influxMeasurement,
+                "measurement": INFLUX_MEASUREMENT,
                 "fields": {
-                    "degF": degF,
-                    "rH": rH,
+                    "degF": deg_f,
+                    "rH": rel_hum,
                     "power": watts
                 }
             }
         ]
-        write_api.write(bucket=influxBucket, record=record)
-        if rH >= high:
-            asyncio.run(plugOn(plugIP))
-            logger.info(f"Change state to ON, rH: {rH}")
+        write_api.write(bucket=INFLUX_BUCKET, record=record)
+        if rel_hum >= HIGH:
+            asyncio.run(plug_on(PLUG_IP))
+            logger.info(f"Change state to ON, rH: {rel_hum}")
             # sleep for specified min run time, less standard sleep time,
             # we will still perform that sleep later anyhow.
-            sleep(realMinRunTime)
-        elif rH < low:
-            asyncio.run(plugOff(plugIP))
-            logger.info(f"Change state to OFF, rH: {rH}")
+            sleep(real_min_run_time)
+        elif rel_hum < LOW:
+            asyncio.run(plug_off(PLUG_IP))
+            logger.info(f"Change state to OFF, rH: {rel_hum}")
         else:
             pass
-        sleep(sleepTime)
+        sleep(SLEEP_TIME)
 
 
 if __name__ == "__main__":

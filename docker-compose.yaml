@@ -7,19 +7,19 @@ services:
     container_name: sbhum
     restart: unless-stopped
     environment:
-      plugIP: FIXME-IP-ADDR
-      low: 40
-      high: 55
-      minRunTime: 900
-      sleepTime: 180
+      PLUG_IP: FIXME-IP-ADDR
+      LOW: 40
+      HIGH: 55
+      MIN_RUN_TIME: 900
+      SLEEP_TIME: 180
       APIKEY: FIXME-APIKEY
       DEVID: FIXME-DEVID
       TZ: America/New_York
-      influxBucket: FIXME
-      influxOrg: FIXME
-      influxToken: 'FIXME'
-      influxURL: 'http://FIXME:8086/'
-      influxMeasurement: FIXME
+      INFLUX_BUCKET: FIXME
+      INFLUX_ORG: FIXME
+      INFLUX_TOKEN: 'FIXME'
+      INFLUX_URL: 'http://FIXME:8086/'
+      INFLUX_MEASUREMENT: FIXME
     networks:
       - containers
 
