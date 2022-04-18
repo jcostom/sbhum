@@ -23,7 +23,7 @@ INFLUX_URL = os.getenv('INFLUX_URL')
 INFLUX_MEASUREMENT = os.getenv('INFLUX_MEASUREMENT')
 DEBUG = int(os.getenv('DEBUG', 0))
 
-VER = '0.5'
+VER = '0.5.1'
 UA_STRING = f"sbhum.py/{VER}"
 
 # Setup logger
