@@ -9,6 +9,8 @@ from kasa import SmartPlug
 from influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import SYNCHRONOUS
 
+# --- To be passed in to container ---
+# Required Vars
 PLUG_IP = os.getenv('PLUG_IP')
 LOW = int(os.getenv('LOW', 40))
 HIGH = int(os.getenv('HIGH', 55))
@@ -21,9 +23,12 @@ INFLUX_ORG = os.getenv('INFLUX_ORG')
 INFLUX_TOKEN = os.getenv('INFLUX_TOKEN')
 INFLUX_URL = os.getenv('INFLUX_URL')
 INFLUX_MEASUREMENT = os.getenv('INFLUX_MEASUREMENT')
+
+# Optional Vars
 DEBUG = int(os.getenv('DEBUG', 0))
 
-VER = '0.5.1'
+# --- Other Globals ---
+VER = '0.6'
 UA_STRING = f"sbhum.py/{VER}"
 
 # Setup logger
@@ -72,7 +77,7 @@ async def read_consumption(ip: str) -> float:
     return(watts)
 
 
-def main():
+def main() -> None:
     # True Min Run time should be the specified interval less the
     # regular sleep time
     real_min_run_time = MIN_RUN_TIME - SLEEP_TIME
