@@ -12,7 +12,8 @@ services:
       HIGH: 55
       MIN_RUN_TIME: 900
       SLEEP_TIME: 180
-      APIKEY: FIXME-APIKEY
+      TOKEN: FIXME-TOKEN
+      SECRET: FIXME-SECRET
       DEVID: FIXME-DEVID
       TZ: America/New_York
       INFLUX_BUCKET: FIXME
