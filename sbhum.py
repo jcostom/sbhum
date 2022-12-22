@@ -4,10 +4,11 @@ import os
 import asyncio
 import logging
 import requests
+import secrets
 from hashlib import sha256
 import hmac
 from base64 import b64encode
-from time import sleep, time
+import time
 from kasa import SmartPlug
 from influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import SYNCHRONOUS
@@ -32,7 +33,7 @@ INFLUX_MEASUREMENT = os.getenv('INFLUX_MEASUREMENT')
 DEBUG = int(os.getenv('DEBUG', 0))
 
 # --- Other Globals ---
-VER = '0.7'
+VER = '0.8'
 UA_STRING = f"sbhum.py/{VER}"
 URL = 'https://api.switch-bot.com/v1.1/devices/{}/status'
 
@@ -57,8 +58,8 @@ def c2f(celsius: float) -> float:
 
 
 def build_headers(secret: str, token: str) -> dict:
-    nonce = ''
-    t = int(round(time() * 1000))
+    nonce = secrets.token_urlsafe()
+    t = int(round(time.time() * 1000))
     string_to_sign = f'{token}{t}{nonce}'
     b_string_to_sign = bytes(string_to_sign, 'utf-8')
     b_secret = bytes(secret, 'utf-8')
@@ -131,13 +132,13 @@ def main() -> None:
             logger.info(f"Change state to ON, rH: {rel_hum}")
             # sleep for specified min run time, less standard sleep time,
             # we will still perform that sleep later anyhow.
-            sleep(real_min_run_time)
+            time.sleep(real_min_run_time)
         elif rel_hum <= LOW:
             asyncio.run(plug_off(PLUG_IP))
             logger.info(f"Change state to OFF, rH: {rel_hum}")
         else:
             pass
-        sleep(SLEEP_TIME)
+        time.sleep(SLEEP_TIME)
 
 
 if __name__ == "__main__":
