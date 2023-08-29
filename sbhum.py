@@ -33,7 +33,7 @@ INFLUX_MEASUREMENT = os.getenv('INFLUX_MEASUREMENT')
 DEBUG = int(os.getenv('DEBUG', 0))
 
 # --- Other Globals ---
-VER = '0.9.1'
+VER = '0.9.2'
 UA_STRING = f"sbhum.py/{VER}"
 URL = 'https://api.switch-bot.com/v1.1/devices/{}/status'
 
