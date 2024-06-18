@@ -2,7 +2,7 @@ FROM python:3.12.4-slim-bookworm AS builder
 
 ARG TZ=America/New_York
 
-RUN apt update && apt -yq install gcc make
+RUN apt update && DEBIAN_FRONTEND=noninteractive apt -yq install gcc make
 RUN \
     pip install requests \
     && pip install python-kasa \
