@@ -5,7 +5,7 @@ ARG TZ=America/New_York
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt -yq install gcc make
 RUN \
     pip install requests \
-    && pip install python-kasa \
+    && pip install python-kasa==0.6.2.1 \
     && pip install influxdb-client \
     && pip cache purge
 
